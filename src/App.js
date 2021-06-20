@@ -2,7 +2,6 @@ import "./App.css";
 import {
   Stack,
   Button,
-  Badge,
   Input,
   Table,
   Thead,
@@ -15,11 +14,73 @@ import {
 } from "@chakra-ui/react";
 import { useState } from "react";
 
+function Results(props) {
+  const [results, setResults] = useState(props.results);
+
+  const sortByPrice = (resultsToSort = results) => {
+    const sortedResults = resultsToSort.sort(function (a, b) {
+      return a.collectionPrice - b.collectionPrice;
+    });
+    setResults(sortedResults);
+    console.log(sortedResults);
+    console.log(results);
+  };
+
+  return (
+    <Stack direction="column">
+      <Table variant="striped" colorScheme="black">
+        <Thead>
+          <Tr>
+            <Th>Thumbnail</Th>
+            <Th>Artist</Th>
+            <Th>Collection name</Th>
+            <Th>Title</Th>
+            <Th style={{ cursor: "pointer" }} onClick={() => sortByPrice()}>
+              Price
+            </Th>
+            <Th>Preview</Th>
+          </Tr>
+        </Thead>
+        <Tbody>
+          {results.map((result) => (
+            <Tr key={result.trackId}>
+              <Td>
+                <img src={result.artworkUrl100} alt=""></img>
+              </Td>
+              <Td>{result.artistName}</Td>
+              <Td>{result.collectionName}</Td>
+              <Td>{result.trackName}</Td>
+              <Td>{result.collectionPrice}</Td>
+              <Td>
+                <Button colorScheme="blue">
+                  <a href={result.previewUrl}>Preview</a>
+                </Button>
+              </Td>
+            </Tr>
+          ))}
+        </Tbody>
+        <Tfoot>
+          <Tr>
+            <Th>Thumbnail</Th>
+            <Th>Artist</Th>
+            <Th>Collection name</Th>
+            <Th>Title</Th>
+            <Th>Price</Th>
+            <Th>Preview</Th>
+          </Tr>
+        </Tfoot>
+      </Table>
+    </Stack>
+  );
+}
+
 function Itunes() {
   const [searchTerm, setSearchTerm] = useState("");
   const [results, setResults] = useState([]);
+  const [displayResults, setDisplayResults] = useState(false);
   return (
     <Stack direction="column">
+      <Heading>Find your favourite music video</Heading>
       <Stack direction="row">
         <Input
           value={searchTerm}
@@ -34,60 +95,20 @@ function Itunes() {
               )}&entity=musicVideo`
             );
             const data = await result.json();
-            console.log(typeof data);
             console.log(data);
             setResults(data.results);
+            setDisplayResults(true);
           }}
         >
           Search
         </Button>
       </Stack>
-      <Heading>Results:</Heading>
-
-      <Table variant="striped" colorScheme="black">
-        <Thead>
-          <Tr>
-            <Th>Thumbnail</Th>
-            <Th>Artist</Th>
-            <Th>Colection name</Th>
-            <Th>Title</Th>
-            <Th>Preview</Th>
-          </Tr>
-        </Thead>
-        <Tbody>
-          {results.map((result) => (
-            <Tr>
-              <Td>
-                <img src={result.artworkUrl100} alt=""></img>{" "}
-              </Td>
-              <Td>{result.artistName}</Td>
-              <Td>{result.collectionName}</Td>
-              <Td>{result.trackName}</Td>
-              <Td>
-                <Button colorScheme="blue">
-                  <a href={result.previewUrl}>Preview</a>{" "}
-                </Button>
-              </Td>
-            </Tr>
-          ))}
-        </Tbody>
-        <Tfoot>
-          <Tr>
-            <Th>Thumbnail</Th>
-            <Th>Artist</Th>
-            <Th>Colection name</Th>
-            <Th>Title</Th>
-            <Th>Preview</Th>
-          </Tr>
-        </Tfoot>
-      </Table>
+      {displayResults && <Results results={results} />}
     </Stack>
   );
 }
 
 function App(props) {
-  const [count, setCount] = useState(0);
-
   return (
     <div className="App">
       <header className="App-header">
