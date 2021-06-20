@@ -15,15 +15,12 @@ import {
 import { useState } from "react";
 
 function Results(props) {
-  const [results, setResults] = useState(props.results);
 
-  const sortByPrice = (resultsToSort = results) => {
+  const sortByPrice = (resultsToSort = props.results) => {
     const sortedResults = resultsToSort.sort(function (a, b) {
       return a.collectionPrice - b.collectionPrice;
     });
-    setResults(sortedResults);
-    console.log(sortedResults);
-    console.log(results);
+    props.setResults(sortedResults.slice());
   };
 
   return (
@@ -42,7 +39,7 @@ function Results(props) {
           </Tr>
         </Thead>
         <Tbody>
-          {results.map((result) => (
+          {props.results.map((result) => (
             <Tr key={result.trackId}>
               <Td>
                 <img src={result.artworkUrl100} alt=""></img>
@@ -95,7 +92,6 @@ function Itunes() {
               )}&entity=musicVideo`
             );
             const data = await result.json();
-            console.log(data);
             setResults(data.results);
             setDisplayResults(true);
           }}
@@ -103,7 +99,9 @@ function Itunes() {
           Search
         </Button>
       </Stack>
-      {displayResults && <Results results={results} />}
+      {displayResults && (
+        <Results results={results} setResults={setResults} />
+      )}
     </Stack>
   );
 }
